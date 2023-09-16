@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // @todo - feature for admins to set specific time for syncing StandTemplate
+        $schedule->command('stand:sync-stand-template-weeks')->weeklyOn(1, '00:00'); // every Monday at 00:00. Cron - 0 0 * * 1
     }
 
     /**
