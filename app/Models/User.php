@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -23,13 +24,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'prename',
-        'email',
-        'password',
-        'congregation_id',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -53,6 +48,19 @@ class User extends Authenticatable implements JWTSubject
     public function congregation(): BelongsTo
     {
         return $this->belongsTo(Congregation::class);
+    }
+
+    /**
+     * Get the user associated with the StandRecords
+     */
+    public function recordsOnStand(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            StandRecords::class,
+            'stands_records_publishers',
+            'stand_template_id',
+            'publisher_id',
+        );
     }
 
     /**

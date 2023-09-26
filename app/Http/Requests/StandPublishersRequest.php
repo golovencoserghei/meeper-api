@@ -11,9 +11,8 @@ use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @property-read int $standTemplateId
- * @property-read int $publisher
- * @property-read int $partner
+ * @property-read int $stand_template_id
+ * @property-read array $publishers
  * @property-read int $time
  */
 class StandPublishersRequest extends FormRequest
@@ -21,27 +20,21 @@ class StandPublishersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'standTemplateId' => [
+            'stand_template_id' => [
                 'required',
                 Rule::exists(StandTemplate::TABLE, 'id')
             ],
-            'publisher' => [
+            'publishers' => [
+                'required',
+                'array',
+            ],
+            'publishers.*' => [
                 'required',
                 Rule::exists(User::TABLE, 'id')
             ],
-            'partner' => [
+            'date_time' => [
                 'required',
-                Rule::exists(User::TABLE, 'id')
-            ],
-            'time' => [
-                'required',
-                'integer',
-                'between:1,23',
-            ],
-            'day' => [
-                'required',
-                'integer',
-                'between:1,7',
+                'date_format:d-m-Y H:i:s',
             ],
         ];
     }

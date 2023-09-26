@@ -13,16 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('stands_records', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('email')->unique()->nullable();
-            $table->string('phone_number')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->unsignedBigInteger('stand_template_id');
+            $table->integer('day');
+            $table->dateTime('date_time');
             $table->timestamps();
+
+            // @todo - add unique flags
+
+            $table->foreign('stand_template_id')
+                ->on('stand_templates')
+                ->references('id')
+                ->cascadeOnDelete();
         });
     }
 
@@ -33,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('stands_records');
     }
 };
