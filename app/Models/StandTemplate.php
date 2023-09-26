@@ -7,17 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property int $id
+ * @property array $week_schedule
+ */
 class StandTemplate extends Model
 {
     use HasFactory;
 
     public const TABLE = 'stand_templates';
 
-    protected $fillable = [
-        'type',
-        'week_schedule',
-        'stand_id',
-        'congregation_id',
+    protected $guarded = [];
+
+    protected $casts = [
+        'week_schedule' => 'array',
+        'created_at' => 'date:d-m-Y H:i:s',
+        'updated_at' => 'date:d-m-Y H:i:s',
     ];
 
     /**
@@ -45,8 +50,8 @@ class StandTemplate extends Model
      *
      * @return HasMany
      */
-    public function standPublishers(): HasMany
+    public function standRecords(): HasMany
     {
-        return $this->hasMany(StandPublishers::class);
+        return $this->hasMany(StandRecords::class, 'stand_template_id');
     }
 }

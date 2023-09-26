@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStandTemplatesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -15,12 +15,17 @@ class CreateStandTemplatesTable extends Migration
     {
         Schema::create('stand_templates', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['current', 'next'])->default('current');
-            $table->enum('day', [1,2,3,4,5,6,7])->default(1);
-            $table->json('times_range');
             $table->unsignedBigInteger('stand_id');
             $table->unsignedBigInteger('congregation_id');
+            $table->json('week_schedule'); // @todo - rename to weeks_schedules
+            $table->json('default_week_schedule')->nullable();
+            $table->boolean('is_last_week_default')->default(false);
+            $table->string('activation_at')->nullable();
+            $table->integer('publishers_at_stand')->default(2);
+            $table->integer('status')->default(1); // enabled
             $table->timestamps();
+
+            $table->unique(['stand_id', 'congregation_id']);
 
             $table->foreign('stand_id')->on('stands')->references('id');
             $table->foreign('congregation_id')->on('congregations')->references('id');
@@ -36,4 +41,4 @@ class CreateStandTemplatesTable extends Migration
     {
         Schema::dropIfExists('stand_templates');
     }
-}
+};

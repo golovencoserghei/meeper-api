@@ -2,27 +2,31 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 
 /**
- * @property-read array $publishers
+ * @property-read ?string $week_schedule
+ * @property-read ?string $activation_at
+ * @property-read ?int $publishers_at_stand
  */
-class StandPublishersUpdateRequest extends FormRequest
+class StandUpdateRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'publishers' => [
-                'required',
+            'week_schedule' => [
+                'sometimes',
                 'array',
             ],
-            'publishers.*' => [
-                'required',
-                Rule::exists(User::TABLE, 'id')
+            'activation_at' => [
+                'sometimes',
+                'string',
+            ],
+            'publishers_at_stand' => [
+                'sometimes',
+                'integer',
             ],
         ];
     }

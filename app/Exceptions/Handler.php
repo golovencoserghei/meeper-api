@@ -42,6 +42,6 @@ class Handler extends ExceptionHandler
             return response()->json(['status' => false, 'message' => "Route doesn't exist."], 404);
         }
 
-        return response()->json(['status' => false, 'message' => $e->getMessage()]);
+        return response()->json(['status' => false, 'message' => $e->getMessage(), 'trace' => $e->getTrace()]);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enums\WeekStatusesEnum;
-use App\Models\StandPublishers;
+use App\Models\StandRecords;
 use App\Models\StandPublishersHistory;
 use App\Models\StandTemplate;
 use Exception;
@@ -56,7 +56,7 @@ class SyncCurrentAndNextWeeksStandTemplatesCommand extends Command
             $standTemplatesForTheNextWeekQuery->update(['type' => WeekStatusesEnum::CURRENT->value]);
 
             StandTemplate::query()->whereIn('id', $currentWeekTeplatesIdsToUpdate)->update(['type' => WeekStatusesEnum::NEXT->value]);
-            StandPublishers::query()->whereIn('id', $standPublishersIdsToRemove)->delete();
+            StandRecords::query()->whereIn('id', $standPublishersIdsToRemove)->delete();
             StandPublishersHistory::query()->insert($standPublishersToInsertInHistory);
 
             Log::info('[Stand Templates Sync] - info', [
@@ -89,7 +89,7 @@ class SyncCurrentAndNextWeeksStandTemplatesCommand extends Command
 
     private function getStandPublishersToSaveInHistory(array $standPublishersIdsToRemove): array
     {
-        $standPublishersWithTemplateInfos = StandPublishers::query()->whereIn('id', $standPublishersIdsToRemove)->with('standTemplate:id,stand_id,congregation_id')->get();
+        $standPublishersWithTemplateInfos = StandRecords::query()->whereIn('id', $standPublishersIdsToRemove)->with('standTemplate:id,stand_id,congregation_id')->get();
 
         $standPublishersHistoryToInsert = [];
 

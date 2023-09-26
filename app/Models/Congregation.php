@@ -12,12 +12,10 @@ class Congregation extends Model
 
     public const TABLE = 'congregations';
 
-    protected $fillable = [
-        'name'
-    ];
+    protected $guarded = ['*'];
 
     /**
-     * Get all of the stands for the Congregation
+     * Get all the stands for the Congregation
      *
      * @return HasMany
      */

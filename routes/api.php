@@ -3,7 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CongregationsController;
 use App\Http\Controllers\Api\PublishersController;
-use App\Http\Controllers\Api\StandPublishersController;
+use App\Http\Controllers\Api\StandRecordsController;
 use App\Http\Controllers\Api\StandTemplateController;
 use App\Http\Controllers\Api\BuilderAssistant\WarehouseController;
 use Illuminate\Support\Facades\Route;
@@ -33,14 +33,16 @@ Route::prefix('auth')->group(static function () {
 
 Route::group(['middleware' => 'auth:api'], function () {
     Route::apiResource('publishers', PublishersController::class);
+
     Route::apiResource('congregations', CongregationsController::class);
 
-    Route::post('stand/publishers', [StandPublishersController::class, 'store']);
-    Route::put('stand/publishers', [StandPublishersController::class, 'update']);
-    Route::delete('stand/publishers', [StandPublishersController::class, 'destroy']);
+    Route::post('stand/records', [StandRecordsController::class, 'store']);
+    Route::post('stand/records/{id}', [StandRecordsController::class, 'removePublishers']);
+    Route::get('stand/records/{id}', [StandRecordsController::class, 'show']);
+    Route::put('stand/records/{id}', [StandRecordsController::class, 'update']);
+    Route::delete('stand/publishers', [StandRecordsController::class, 'destroy']);
 
-    Route::get('stand/templates', [StandTemplateController::class, 'index']);
-    Route::get('week_days', [StandTemplateController::class, 'weekDays']);
+    Route::apiResource('stand/templates', StandTemplateController::class);
 
     Route::get('warehouse', [WarehouseController::class, 'index']);
     Route::post('warehouse', [WarehouseController::class, 'store']);

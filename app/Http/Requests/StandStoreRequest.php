@@ -11,39 +11,37 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property-read int $congregation_id
- * @property-read array $stand_ids
- * @property-read string $date_day_start
- * @property-read string $date_day_end
- * @property-read string $all_weeks
+ * @property-read int $stand_id
+ * @property-read string $week_schedule
+ * @property-read ?string $activation_at
+ * @property-read ?int $publishers_at_stand
  */
-class StandRequest extends FormRequest
+class StandStoreRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
             'congregation_id' => [
                 'required',
-                Rule::exists(Congregation::TABLE, 'id')
+                Rule::exists(Congregation::TABLE, 'id'),
 //                Rule::prohibitedIf() @todo - make validation for 1 unique congregation and stand template
             ],
-            'stand_ids' => [
-                'required',
-                'array',
-            ],
-            'stand_ids.*' => [
+            'stand_id' => [
                 'required',
                 Rule::exists(Stand::TABLE, 'id')
             ],
-            'date_day_start' => [
+            'week_schedule' => [
                 'required',
-                'date_format:d-m-Y',
+                'array',
             ],
-            'date_day_end' => [
-                'required',
-                'date_format:d-m-Y',
-                'after_or_equal:dateDayStart', // @todo - don't more than 7 days
+            'activation_at' => [
+                'sometimes',
+                'string',
             ],
-            'all_weeks' => ['sometimes', 'boolean']
+            'publishers_at_stand' => [
+                'sometimes',
+                'integer',
+            ],
         ];
     }
 
