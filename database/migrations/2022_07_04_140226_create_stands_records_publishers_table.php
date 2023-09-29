@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('publisher_id');
             $table->timestamps();
 
+            $table->unique(['stands_records_id', 'publisher_id']);
+
             $table->foreign('stands_records_id')->references('id')->on('stands_records');
             $table->foreign('publisher_id')->references('id')->on('users');
         });
