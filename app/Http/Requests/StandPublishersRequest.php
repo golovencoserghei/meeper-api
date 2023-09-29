@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\StandTemplate;
 use App\Models\User;
+use App\Rules\StandPublishersStoreRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @property-read int $stand_template_id
  * @property-read array $publishers
- * @property-read int $time
+ * @property-read string $date_time
  */
 class StandPublishersRequest extends FormRequest
 {

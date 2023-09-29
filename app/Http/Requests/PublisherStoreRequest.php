@@ -10,26 +10,27 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
 /**
- * @property-read int $congregationId
- * @property-read string $name
- * @property-read string $prename
+ * @property-read int $congregation_id
+ * @property-read string $first_name
+ * @property-read string $last_name
  * @property-read string $email
  * @property-read string $password
+ * @property-read ?string $phone
  */
 class PublisherStoreRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'congregationId' => [
+            'congregation_id' => [
                 'required',
                 Rule::exists(Congregation::TABLE, 'id')
             ],
-            'name' => [
+            'first_name' => [
                 'required',
                 'string'
             ],
-            'prename' => [
+            'last_name' => [
                 'required',
                 'string'
             ],
@@ -39,6 +40,10 @@ class PublisherStoreRequest extends FormRequest
             ],
             'password' => [
                 'required',
+                'string'
+            ],
+            'phone' => [
+                'sometimes',
                 'string'
             ],
         ];

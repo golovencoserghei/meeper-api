@@ -36,15 +36,15 @@ class StandRecordsController extends Controller
         } catch (Exception $exception) {
             DB::rollBack();
 
-            Log::error('stand publiushers save error', [
+            Log::error('stand publishers save error', [
                 'message' => $exception->getMessage(),
                 'trace' => $exception->getTrace(),
             ]);
 
             throw new Exception($exception->getMessage());
         }
-
     }
+
     public function update(int $id, StandPublishersUpdateRequest $request): JsonResource
     {
         /** @var StandRecords $standRecord */
