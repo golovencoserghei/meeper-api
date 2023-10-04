@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CongregationsController;
 use App\Http\Controllers\Api\PublishersController;
+use App\Http\Controllers\Api\StandController;
 use App\Http\Controllers\Api\StandRecordsController;
 use App\Http\Controllers\Api\StandTemplateController;
 use App\Http\Controllers\Api\BuilderAssistant\WarehouseController;
@@ -41,6 +42,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('stand/records/{id}', [StandRecordsController::class, 'show']);
     Route::put('stand/records/{id}', [StandRecordsController::class, 'update']);
     Route::delete('stand/publishers', [StandRecordsController::class, 'destroy']);
+
+    Route::get('stands', [StandController::class, 'index']);
 
     Route::apiResource('stand/templates', StandTemplateController::class);
 
