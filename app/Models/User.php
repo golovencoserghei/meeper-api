@@ -13,6 +13,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * @property int $congregation_id
+ * @property int $id
  */
 class User extends Authenticatable implements JWTSubject
 {

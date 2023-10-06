@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Query\Builder;
+use App\Http\Requests\RoleAssignPermissionRequest;
+use App\Http\Requests\RoleAssignUserRequest;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -11,7 +14,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
-class RoleController extends Controller
+class RolesController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
@@ -28,7 +31,6 @@ class RoleController extends Controller
     {
         $role = Role::query()->create([
             'name' => $request->get('name'),
-            'guard_name' => $request->get('guard_name'),
         ]);
 
         return Response::json(['data' => $role], HttpResponse::HTTP_CREATED);
@@ -43,29 +45,21 @@ class RoleController extends Controller
             $role->name = $request->get('name');
         }
 
-        if ($request->has('guard_name')) {
-            $role->guard_name = $request->get('guard_name');
-        }
-
         $role->save();
         $role->fresh();
 
         return Response::json(['data' => $role], HttpResponse::HTTP_CREATED);
     }
 
-    public function assignPermissionToRole(Request $request): JsonResponse
+    public function assignPermissionToRole(RoleAssignPermissionRequest $request): JsonResponse
     {
-        $role = Role::findByName(
-            $request->input('role_name'),
-            $request->input('role_guard_name')
-        );
+        $role = Role::findById($request->role_id);
 
-        $permission = Permission::findByName(
-            $request->input('permission_name'),
-            $request->input('permission_guard_name')
-        );
+        $permissions = Permission::query()
+            ->whereIn('id', $request->permission_ids)
+            ->get();
 
-        $role->givePermissionTo($permission);
+        $role->givePermissionTo($permissions);
 
         return Response::json(
             ['message' => 'Permission was attached to a role successfully!'],
@@ -73,14 +67,40 @@ class RoleController extends Controller
         );
     }
 
+    public function assignRoleToUser(RoleAssignUserRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = User::query()->findOrFail($request->user_id);
+        $role = Role::findById($request->role_id);
+
+        $user->assignRole($role);
+
+        return Response::json(
+            ['message' => "$role->name was attached to user with id: $user->id"],
+        );
+    }
+
+    public function unassignUserRole(RoleAssignUserRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = User::query()->findOrFail($request->user_id);
+        $role = Role::findById($request->role_id);
+
+        $user->removeRole($role);
+
+        return Response::json(
+            ['message' => "$role->name was unassigned from user with id: $user->id"],
+        );
+    }
+
     public function getRolePermissions(int $id): JsonResponse
     {
-        return Response::json(['data' => Role::query()->findOrFail($id)->with('permissions')]);
+        return Response::json(['data' => Role::query()->where('id', $id)->with('permissions')->get()]);
     }
 
     public function getRoleUsers(int $id): JsonResponse
     {
-        return Response::json(['data' => Role::query()->findOrFail($id)->with('users')]);
+        return Response::json(['data' => Role::query()->where('id', $id)->with('users')->get()]);
     }
 
     public function destroy(int $id): JsonResponse

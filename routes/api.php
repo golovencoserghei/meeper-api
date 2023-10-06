@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CongregationsController;
+use App\Http\Controllers\Api\PermissionsController;
 use App\Http\Controllers\Api\PublishersController;
+use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\StandController;
 use App\Http\Controllers\Api\StandRecordsController;
 use App\Http\Controllers\Api\StandTemplateController;
@@ -32,7 +34,25 @@ Route::prefix('auth')->group(static function () {
     Route::get('/user-profile', [AuthController::class, 'userProfile'])->middleware('auth:api');
 });
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:api'], static function () {
+    Route::group(
+        [
+            'middleware' => ['role:admin'],
+            'prefix' => 'admin',
+        ],
+        static function () {
+            Route::apiResource('permissions', PermissionsController::class);
+            Route::apiResource('roles', RolesController::class);
+
+            Route::post('roles/assign-permissions-to-role', [RolesController::class, 'assignPermissionToRole']);
+            Route::get('roles/{id}/permissions', [RolesController::class, 'getRolePermissions']);
+            Route::get('roles/{id}/users', [RolesController::class, 'getRoleUsers']);
+
+            Route::post('roles/assign-role-to-user', [RolesController::class, 'assignRoleToUser']);
+            Route::post('roles/unassign-user-role', [RolesController::class, 'unassignUserRole']);
+        }
+    );
+
     Route::apiResource('publishers', PublishersController::class);
 
     Route::apiResource('congregations', CongregationsController::class);

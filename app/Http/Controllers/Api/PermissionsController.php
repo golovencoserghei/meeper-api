@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -25,10 +25,7 @@ class PermissionsController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $permission = Permission::query()->create([
-            'name' => $request->get('name'),
-            'guard_name' => $request->get('guard_name'),
-        ]);
+        $permission = Permission::query()->create(['name' => $request->get('name')]);
 
         return Response::json(['data' => $permission], HttpResponse::HTTP_CREATED);
     }
@@ -40,10 +37,6 @@ class PermissionsController extends Controller
 
         if ($request->has('name')) {
             $permission->name = $request->get('name');
-        }
-
-        if ($request->has('guard_name')) {
-            $permission->guard_name = $request->get('guard_name');
         }
 
         $permission->save();
