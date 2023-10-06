@@ -60,6 +60,6 @@ class RolePermissionSeeder extends Seeder
 
         /** @var User $user */
         $user = User::query()->where('email', 'admin@gmail.com')->first();
-        $user->assignRole('role');
+        $user->assignRole('admin');
     }
 }
