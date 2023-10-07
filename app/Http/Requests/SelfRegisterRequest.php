@@ -22,7 +22,6 @@ class SelfRegisterRequest extends FormRequest
             'password' => 'required|string|confirmed|min:6',
             'phone_number' => 'required|string',
             'congregation_name' => 'required|string',
-            'congregation_location' => 'required|string',
         ];
     }
 }

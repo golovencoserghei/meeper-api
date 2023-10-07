@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory(10)->forCongregation()->create();
-        \App\Models\User::factory()->forCongregation()->create([
+        User::factory(10)->forCongregation()->create();
+        User::factory()->forCongregation()->create([
             'first_name' => 'Admin',
             'last_name' => 'Admin',
             'email' => 'admin@gmail.com',

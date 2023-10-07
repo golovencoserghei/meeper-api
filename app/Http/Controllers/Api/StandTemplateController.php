@@ -96,7 +96,7 @@ class StandTemplateController extends Controller
                 return $record;
             });  // @todo - move results array into custom resource and remove columns there
 
-            if (!empty($templatesInDeterminedWeekDay)) {
+            if ($templatesInDeterminedWeekDay->isNotEmpty()) {
                 $results[$weekDayFromPeriod] = $templatesInDeterminedWeekDay->toArray();
             }
         }
