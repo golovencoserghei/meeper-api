@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Congregation;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response as HttpStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response as HttpStatus;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class AuthController extends Controller
+class LoginController extends Controller
 {
     /**
      * @throws ValidationException
@@ -40,38 +37,6 @@ class AuthController extends Controller
         }
 
         return $this->createNewToken($token);
-    }
-
-    /**
-     * Register a User.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ValidationException
-     */
-    public function register(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|between:2,100',
-            'last_name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'congregation_id' => ['required', Rule::exists(Congregation::TABLE, 'id')],
-        ]);
-
-        if ($validator->fails()) {
-            return Response::json($validator->errors()->toJson(), HttpStatus::HTTP_BAD_REQUEST);
-        }
-
-        $user = User::query()->create(array_merge(
-            $validator->validated(),
-            ['password' => bcrypt($request->password)]
-        ));
-
-        return Response::json([
-            'message' => 'User successfully registered',
-            'user' => $user
-        ], HttpStatus::HTTP_CREATED);
     }
 
     /**

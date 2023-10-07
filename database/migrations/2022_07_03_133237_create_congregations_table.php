@@ -18,6 +18,10 @@ class CreateCongregationsTable extends Migration
             $table->string('name');
             $table->timestamps();
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('congregation_id')->references('id')->on('congregations');
+        });
     }
 
     /**

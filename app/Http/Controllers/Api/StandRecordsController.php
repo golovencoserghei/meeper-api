@@ -26,7 +26,7 @@ class StandRecordsController extends Controller
                 'stand_template_id' => $request->stand_template_id,
                 'day' => Carbon::parse($request->date_time)->dayOfWeekIso, // @todo - change name to week_day
                 'date_time' => Carbon::parse($request->date_time)->format('Y-m-d H:i:s'),
-            ]); // @todo - add validation if users already registered
+            ]);
 
             $standRecord->publishers()->attach($request->publishers);
 
