@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
@@ -20,7 +21,7 @@ class PublishersController extends Controller
     public function index(PublishersRequest $request): JsonResource
     {
         // @todo - create index in db on congregation_id
-        $users = User::query()->where('congregation_id', $request->congregationId)->get();
+        $users = User::query()->where('congregation_id', $request->congregation_id)->get();
 
         return JsonResource::collection($users);
     }
@@ -73,7 +74,7 @@ class PublishersController extends Controller
 
         $user->update($update);
 
-        return new JsonResource($user);
+        return new JsonResource(['data' => $user]);
     }
 
     // @todo - should be in admin panel and manage by roles
@@ -87,23 +88,31 @@ class PublishersController extends Controller
     public function myRecords(Request $request): JsonResponse
     {
         $standRecords = StandRecords::query()
-            ->when($request->missing('date_time'), static function($query) use ($request) {
-                $query->where('date_time', '>=', Date::now()->format('Y-m-h H:i'));
+            ->when($request->missing('date_time'), static function($query) {
+                $query->where('date_time', '>=', Date::now()->subMonth()->format('Y-m-h H:i:s'));
             })
             ->when($request->input('date_time_start'), static function($query) use ($request) {
                 $query->where('date_time', '>=', $request->input('date_time_start'));
             })
             ->when($request->input('date_time_end'), static function($query) use ($request) {
-                $query->where('date_time', '>=', $request->input('date_time_end'));
+                $query->where('date_time', '<=', $request->input('date_time_end'));
             })
             ->when($request->input('day'), static function ($query) use ($request) {
-                $query->where($request->input('day'));
+                $query->where('day', $request->input('day'));
             })
-            ->with('publishers')
-            ->whereHas('publishers', static function ($query) {
-                // @todo - get by auth user
-            });
+            ->with('publishers', static function ($query) use ($request) {
+                $query
+                    ->where('publisher_id', Auth::id())
+                    ->orWhere('publisher_id', $request->get('user_id'));
+            })
+            ->whereHas('publishers', static function ($query) use ($request) {
+                $query
+                    ->where('publisher_id', Auth::id())
+                    ->orWhere('publisher_id', $request->get('user_id'));
+            })
+            ->orderBy('date_time')
+            ->get();
 
-        return new JsonResponse($standRecords);
+        return new JsonResponse(['data' => $standRecords]);
     }
 }

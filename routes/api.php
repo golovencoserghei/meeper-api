@@ -57,7 +57,8 @@ Route::group(['middleware' => 'auth:api'], static function () {
         }
     );
 
-    Route::apiResource('publishers', PublishersController::class);
+    Route::apiResource('publishers', PublishersController::class)->except(['show']);
+    Route::get('publishers/my-records', [PublishersController::class, 'myRecords']);
 
     Route::apiResource('congregations', CongregationsController::class);
     Route::post('congregations/add-user', [CongregationsController::class, 'addUserToCongregation']);
