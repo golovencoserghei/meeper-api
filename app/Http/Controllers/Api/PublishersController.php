@@ -89,7 +89,7 @@ class PublishersController extends Controller
     {
         $standRecords = StandRecords::query()
             ->when($request->missing('date_time'), static function($query) {
-                $query->where('date_time', '>=', Date::now()->subMonth()->format('Y-m-h H:i:s'));
+                $query->where('date_time', '>=', Date::now()->format('Y-m-h H:i:s'));
             })
             ->when($request->input('date_time_start'), static function($query) use ($request) {
                 $query->where('date_time', '>=', $request->input('date_time_start'));
