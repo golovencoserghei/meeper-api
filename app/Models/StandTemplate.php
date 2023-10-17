@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 /**
  * @property int $id
  * @property array $week_schedule
+ * @property array $default_week_schedule
+ * @property bool $is_last_week_default
  */
 class StandTemplate extends Model
 {
@@ -21,6 +23,7 @@ class StandTemplate extends Model
 
     protected $casts = [
         'week_schedule' => 'array',
+        'default_week_schedule' => 'array',
         'created_at' => 'date:d-m-Y H:i:s',
         'updated_at' => 'date:d-m-Y H:i:s',
     ];
