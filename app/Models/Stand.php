@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $location
+ * @property string $name
+ */
 class Stand extends Model
 {
     public const TABLE = 'stands';
@@ -14,16 +17,7 @@ class Stand extends Model
 
     protected $fillable = [
         'name',
+        'location',
         'congregation_id',
     ];
-
-    /**
-     * Get the congregations that owns the Stand
-     *
-     * @return BelongsTo
-     */
-    public function congregations(): BelongsTo
-    {
-        return $this->belongsTo(Congregation::class);
-    }
 }
