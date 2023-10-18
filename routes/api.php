@@ -3,6 +3,7 @@
 use App\Enums\RolesEnum;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegistrationController;
+use App\Http\Controllers\Api\Auth\SocialAuthController;
 use App\Http\Controllers\Api\BuilderAssistant\WarehouseController;
 use App\Http\Controllers\Api\CongregationsController;
 use App\Http\Controllers\Api\PermissionsController;
@@ -30,6 +31,10 @@ Route::get('/index', static function () {
 
 Route::prefix('auth')->group(static function () {
     Route::post('/login', [LoginController::class, 'login'])->name('login');
+    Route::post('login/socialite', [SocialAuthController::class, 'socialiteLogin']);
+    Route::post('login/google', [SocialAuthController::class, 'googleLogin']);
+    Route::get('login/google-url', [SocialAuthController::class, 'googleLoginUrl']);
+
     Route::post('/register', [RegistrationController::class, 'register']);
     Route::post('/self-register', [RegistrationController::class, 'selfRegister']);
 });
