@@ -10,16 +10,20 @@ use App\Models\StandTemplate;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response;
 
 class StandTemplateController extends Controller
 {
+    private const DAY_MONTH_FORMAT = 'd.m';
+
     public function index(StandRequest $request): JsonResponse
     {
         $dateDayEnd = Carbon::make($request->date_day_end);
         $period = CarbonPeriod::create(
-            Carbon::make($request->date_day_start)->format('Y-m-d'),
-            $dateDayEnd->format('Y-m-d')
+            Carbon::make($request->date_day_start)?->format('Y-m-d'),
+            $dateDayEnd?->format('Y-m-d')
         );
 
         $determinedWeek = now()->diffInWeeks($dateDayEnd) + 1; // because if current week than diff = 0
@@ -49,7 +53,7 @@ class StandTemplateController extends Controller
 
             $templatesInDeterminedWeekDay = [];
             /** @var StandTemplate $template */
-            foreach ($standTemplates as $key => $template) {
+            foreach ($standTemplates as $template) {
                 if (!isset($template->week_schedule[$determinedWeek][$determinedWeekDay])) {
                     continue;
                 }
@@ -86,12 +90,10 @@ class StandTemplateController extends Controller
                 $templatesInDeterminedWeekDay[] = $template->toArray();
             }
 
-            unset($template['day_times']);
-            unset($template['publishers_records']);
+            unset($template['day_times'], $template['publishers_records']);
 
             $templatesInDeterminedWeekDay = collect($templatesInDeterminedWeekDay)->map(function ($record) {
-                unset($record['week_schedule']);
-                unset($record['stand_records']);
+                unset($record['week_schedule'], $record['stand_records']);
 
                 return $record;
             });  // @todo - move results array into custom resource and remove columns there
@@ -157,21 +159,38 @@ class StandTemplateController extends Controller
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 
-    public function weekDays(): JsonResponse
+    public function weeklyRanges(Request $request): JsonResponse
     {
-        $now = Carbon::now();
-        $currentWeekDay = $now->copy()->dayOfWeek; // 0 (for Sunday) through 6 (for Saturday)
-        $weekStartDate = $now->copy()->startOfWeek()->format('d-m-Y');
-        $weekEndDate = $now->copy()->endOfWeek()->format('d-m-Y');
-        $nextWeekStartDate = $now->copy()->addWeek()->startOfWeek()->format('d-m-Y');
-        $nextWeekEndDate = $now->copy()->addWeek()->endOfWeek()->format('d-m-Y');
+        $congregationId = $request->get('congregation_id'); // maybe add validation
+        /** @var Collection<StandTemplate> $standTemplates */
+        $standTemplates = StandTemplate::query()
+            ->select(['id', 'week_schedule'])
+            ->where('congregation_id', $congregationId)
+            ->get();
+
+        $weekRanges = [];
+        foreach ($standTemplates as $standTemplate) {
+            $weekSchedule = $standTemplate->week_schedule;
+
+            foreach ($weekSchedule as $weekNumber => $week) {
+                if ($weekNumber === 1) {
+                    $startDate = Carbon::now()->format(self::DAY_MONTH_FORMAT);
+                    $endDate = Carbon::now()->endOfWeek()->format(self::DAY_MONTH_FORMAT);
+                    $weekRanges[] = "$startDate-$endDate";
+
+                    continue;
+                }
+
+                $week = Carbon::now()->addWeeks($weekNumber - 1); // because we're adding to the current week
+                $startDate = $week->startOfWeek()->format(self::DAY_MONTH_FORMAT);
+                $endDate = $week->endOfWeek()->format(self::DAY_MONTH_FORMAT);
+
+                $weekRanges[] = "$startDate-$endDate";
+            }
+        }
 
         return new JsonResponse([
-            'currentNumberOfWeekDay' => $currentWeekDay,
-            'currentWeekStartDate' => $weekStartDate,
-            'currentWeekEndDate' => $weekEndDate,
-            'nextWeekStartDate' => $nextWeekStartDate,
-            'nextWeekEndDate' => $nextWeekEndDate,
+            'weekly_ranges' => array_unique($weekRanges),
         ]);
     }
 }
