@@ -184,7 +184,7 @@ class StandTemplateController extends Controller
                 if ($weekNumber === 1) {
                     $startDate = Carbon::now()->format(self::DATE_FORMAT);
                     $endDate = Carbon::now()->endOfWeek()->format(self::DATE_FORMAT);
-                    $weekRanges[] = "$startDate-$endDate";
+                    $weekRanges[] = $this->weekRangesFormat($startDate, $endDate);
 
                     continue;
                 }
@@ -193,12 +193,17 @@ class StandTemplateController extends Controller
                 $startDate = $week->startOfWeek()->format(self::DATE_FORMAT);
                 $endDate = $week->endOfWeek()->format(self::DATE_FORMAT);
 
-                $weekRanges[] = "$startDate $endDate";
+                $weekRanges[] = $this->weekRangesFormat($startDate, $endDate);
             }
         }
 
         return new JsonResponse([
             'weekly_ranges' => array_unique($weekRanges),
         ]);
+    }
+
+    private function weekRangesFormat(string $startDate, string $endDate): string
+    {
+        return sprintf('%s %s', $startDate, $endDate);
     }
 }
