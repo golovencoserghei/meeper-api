@@ -140,6 +140,14 @@ class StandTemplateController extends Controller
             $storeData['publishers_at_stand'] = $request->publishers_at_stand;
         }
 
+        if ($request->is_reports_enabled) {
+            $storeData['is_reports_enabled'] = $request->is_reports_enabled;
+        }
+
+        if ($request->is_last_week_default) {
+            $storeData['is_last_week_default'] = $request->is_last_week_default;
+        }
+
         $standTemplate = tap(StandTemplate::query()->where('id', $id))
             ->update($storeData)
             ->first();
