@@ -16,14 +16,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StandTemplateController extends Controller
 {
-    private const DAY_MONTH_FORMAT = 'd.m';
+    private const DATE_FORMAT = 'd-m-Y';
 
     public function index(StandRequest $request): JsonResponse
     {
         $dateDayEnd = Carbon::make($request->date_day_end);
         $period = CarbonPeriod::create(
-            Carbon::make($request->date_day_start)?->format('Y-m-d'),
-            $dateDayEnd?->format('Y-m-d')
+            Carbon::make($request->date_day_start)?->format(self::DATE_FORMAT),
+            $dateDayEnd?->format(self::DATE_FORMAT)
         );
 
         $determinedWeek = now()->diffInWeeks($dateDayEnd) + 1; // because if current week than diff = 0
@@ -45,11 +45,11 @@ class StandTemplateController extends Controller
 
         $results = [];
         foreach ($period as $date) {
-            $weekDayFromPeriod = $date->format('d-m');
+            $weekDayFromPeriod = $date->format(self::DATE_FORMAT);
             $determinedWeekDay = $date->dayOfWeekIso;
             [$day, $month] = explode('-', $weekDayFromPeriod);
             $year = $date->format('Y');
-            $carbonFullTime = Carbon::createFromFormat('d-m-Y', "$day-$month-$year");
+            $carbonFullTime = Carbon::createFromFormat(self::DATE_FORMAT, "$day-$month-$year");
 
             $templatesInDeterminedWeekDay = [];
             /** @var StandTemplate $template */
@@ -174,18 +174,18 @@ class StandTemplateController extends Controller
 
             foreach ($weekSchedule as $weekNumber => $week) {
                 if ($weekNumber === 1) {
-                    $startDate = Carbon::now()->format(self::DAY_MONTH_FORMAT);
-                    $endDate = Carbon::now()->endOfWeek()->format(self::DAY_MONTH_FORMAT);
+                    $startDate = Carbon::now()->format(self::DATE_FORMAT);
+                    $endDate = Carbon::now()->endOfWeek()->format(self::DATE_FORMAT);
                     $weekRanges[] = "$startDate-$endDate";
 
                     continue;
                 }
 
                 $week = Carbon::now()->addWeeks($weekNumber - 1); // because we're adding to the current week
-                $startDate = $week->startOfWeek()->format(self::DAY_MONTH_FORMAT);
-                $endDate = $week->endOfWeek()->format(self::DAY_MONTH_FORMAT);
+                $startDate = $week->startOfWeek()->format(self::DATE_FORMAT);
+                $endDate = $week->endOfWeek()->format(self::DATE_FORMAT);
 
-                $weekRanges[] = "$startDate-$endDate";
+                $weekRanges[] = "$startDate $endDate";
             }
         }
 
