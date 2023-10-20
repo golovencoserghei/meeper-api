@@ -198,7 +198,7 @@ class StandTemplateController extends Controller
         }
 
         return new JsonResponse([
-            'weekly_ranges' => array_unique($weekRanges),
+            'weekly_ranges' => array_values(array_unique($weekRanges)),
         ]);
     }
 
