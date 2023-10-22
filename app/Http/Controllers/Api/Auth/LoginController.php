@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserInfoResource;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,11 +66,17 @@ class LoginController extends Controller
     /**
      * Get the authenticated User.
      *
-     * @return JsonResponse
+     * @return UserInfoResource
      */
-    public function userProfile(): JsonResponse
+    public function userProfile(): UserInfoResource
     {
-        return response()->json(auth()->user());
+        return new UserInfoResource(
+            User::query()
+                ->select('users.*', 'congregations.name as congregation_name')
+                ->where('users.id', Auth::id())
+                ->join('congregations', 'users.congregation_id', '=', 'congregations.id')
+                ->first()
+            );
     }
 
     /**
