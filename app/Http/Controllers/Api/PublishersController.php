@@ -35,7 +35,7 @@ class PublishersController extends Controller
             'email' => $request->email,
             'congregation_id' => $request->congregation_id,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone_number' => $request->phone_number,
         ]);
 
         return new JsonResource($user);
@@ -68,8 +68,8 @@ class PublishersController extends Controller
             $update['password'] = Hash::make($request->password);
         }
 
-        if ($request->phone) {
-            $update['phone'] = $request->phone;
+        if ($request->phone_number) {
+            $update['phone_number'] = $request->phone_number;
         }
 
         $user->update($update);

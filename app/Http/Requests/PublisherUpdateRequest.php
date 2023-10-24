@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
  * @property-read ?string $last_name
  * @property-read ?string $email
  * @property-read ?string $password
- * @property-read ?string $phone
+ * @property-read ?string $phone_number
  */
 class PublisherUpdateRequest extends FormRequest
 {
@@ -42,7 +42,7 @@ class PublisherUpdateRequest extends FormRequest
                 'sometimes',
                 'string'
             ],
-            'phone' => [
+            'phone_number' => [
                 'sometimes',
                 'string'
             ],
