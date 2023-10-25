@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property array $week_schedule
  * @property array $default_week_schedule
  * @property bool $is_last_week_default
+ * @property int $congregation_id
+ * @property int $stand_id
  */
 class StandTemplate extends Model
 {
