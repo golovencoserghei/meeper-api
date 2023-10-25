@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PublishersController;
 use App\Http\Controllers\Api\RolesController;
 use App\Http\Controllers\Api\StandController;
 use App\Http\Controllers\Api\StandRecordsController;
+use App\Http\Controllers\Api\StandReportsController;
 use App\Http\Controllers\Api\StandTemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +76,8 @@ Route::group(['middleware' => 'auth:api'], static function () {
     Route::apiResource('stand/templates', StandTemplateController::class)
         ->middleware('role:' . RolesEnum::RESPONSIBLE_FOR_STAND->value . '|' . RolesEnum::ADMIN->value);
     Route::get('stand/weekly-ranges', [StandTemplateController::class, 'weeklyRanges']);
+
+    Route::apiResource('stand/reports', StandReportsController::class);
 
     Route::get('warehouse', [WarehouseController::class, 'index']);
     Route::post('warehouse', [WarehouseController::class, 'store']);
