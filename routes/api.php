@@ -69,7 +69,7 @@ Route::group(['middleware' => 'auth:api'], static function () {
     Route::post('stand/records/{id}', [StandRecordsController::class, 'removePublishers']);
     Route::get('stand/records/{id}', [StandRecordsController::class, 'show']);
     Route::put('stand/records/{id}', [StandRecordsController::class, 'update']);
-    Route::delete('stand/publishers', [StandRecordsController::class, 'destroy']);
+    Route::delete('stand/records/{id}', [StandRecordsController::class, 'destroy']);
 
     Route::apiResource('stands', StandController::class);
 //        ->middleware('role:' . RolesEnum::RESPONSIBLE_FOR_STAND->value . '|' . RolesEnum::ADMIN->value);

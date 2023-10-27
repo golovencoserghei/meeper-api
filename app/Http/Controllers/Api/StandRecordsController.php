@@ -77,7 +77,11 @@ class StandRecordsController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        StandRecords::destroy($id);
+        /** @var StandRecords $standRecords */
+        $standRecords = StandRecords::query()->findOrFail($id);
+        $standRecords->publishers()->detach();
+
+        $standRecords->delete();
 
         return Response::json(['message' => 'Stand record was deleted.']);
     }
