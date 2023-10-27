@@ -70,8 +70,8 @@ Route::group(['middleware' => 'auth:api'], static function () {
     Route::put('stand/records/{id}', [StandRecordsController::class, 'update']);
     Route::delete('stand/publishers', [StandRecordsController::class, 'destroy']);
 
-    Route::apiResource('stands', StandController::class)
-        ->middleware('role:' . RolesEnum::RESPONSIBLE_FOR_STAND->value . '|' . RolesEnum::ADMIN->value);
+    Route::apiResource('stands', StandController::class);
+//        ->middleware('role:' . RolesEnum::RESPONSIBLE_FOR_STAND->value . '|' . RolesEnum::ADMIN->value);
 
     Route::apiResource('stand/templates', StandTemplateController::class);
     Route::get('stand/weekly-ranges', [StandTemplateController::class, 'weeklyRanges']);
