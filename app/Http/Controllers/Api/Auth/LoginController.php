@@ -79,6 +79,14 @@ class LoginController extends Controller
             );
     }
 
+    public function userPermissions(): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        return Response::json(['data' => $user->getAllPermissions()->pluck('name')]);
+    }
+
     /**
      * Get the token array structure.
      *

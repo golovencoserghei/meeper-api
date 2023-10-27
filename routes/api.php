@@ -36,9 +36,10 @@ Route::prefix('auth')->group(static function () {
 });
 
 Route::group(['middleware' => 'auth:api'], static function () {
-    Route::get('auth/user-profile', [LoginController::class, 'userProfile'])->middleware('auth:api');
-    Route::post('auth/logout', [LoginController::class, 'logout'])->middleware('auth:api');
-    Route::post('auth/refresh', [LoginController::class, 'refresh'])->middleware('auth:api');
+    Route::get('auth/user-profile', [LoginController::class, 'userProfile']);
+    Route::post('auth/logout', [LoginController::class, 'logout']);
+    Route::post('auth/refresh', [LoginController::class, 'refresh']);
+    Route::get('user/permission', [LoginController::class, 'userPermissions']);
 
     Route::group(
         [
