@@ -19,7 +19,10 @@ return new class extends Migration
 
             $table->unique(['stands_records_id', 'publisher_id']);
 
-            $table->foreign('stands_records_id')->references('id')->on('stands_records');
+            $table->foreign('stands_records_id')
+                ->references('id')
+                ->on('stands_records')
+                ->cascadeOnDelete();
             $table->foreign('publisher_id')->references('id')->on('users');
         });
     }
