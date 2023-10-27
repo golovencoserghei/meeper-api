@@ -69,7 +69,7 @@ class StandTemplateController extends Controller
                             $carbonFullTime->endOfDay()->format('Y-m-d H:i:s')
                         ]
                     )
-                    ->groupBy('date_time');
+                    ->keyBy('date_time');
 
                 $records = [];
                 foreach ($dayTimes as $dayTime) {
