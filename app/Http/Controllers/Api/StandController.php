@@ -7,6 +7,7 @@ use App\Models\Congregation;
 use App\Models\Stand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -16,22 +17,11 @@ class StandController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'congregation_id' => [
-                'required',
-                Rule::exists(Congregation::TABLE, 'id'),
-            ],
-        ]);
+        $congregationId = $request->get('congregation_id', Auth::user()->congregation_id);
 
-        if ($validator->fails()) {
-            return new JsonResponse($validator->getMessageBag(), Response::HTTP_UNPROCESSABLE_ENTITY); // or move to form request
-        }
-
-        $congregationId = $request->get('congregation_id');
-
-        return new JsonResponse([
-            Stand::query()->where('congregation_id', $congregationId)->get()
-        ]);
+        return new JsonResponse(
+            ['data' => Stand::query()->where('congregation_id', $congregationId)->get()]
+        );
     }
 
     /**
@@ -75,9 +65,6 @@ class StandController extends Controller
         return new JsonResponse(['data' => Stand::query()->findOrFail($id)]);
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function update(int $id, Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [

@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Congregation;
-use App\Models\Stand;
+use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -36,7 +36,8 @@ class PublisherStoreRequest extends FormRequest
             ],
             'email' => [
                 'required',
-                'email'
+                'email',
+                Rule::unique(User::TABLE, 'email')
             ],
             'password' => [
                 'required',
