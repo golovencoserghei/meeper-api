@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StandRequest;
 use App\Http\Requests\StandStoreRequest;
 use App\Http\Requests\StandUpdateRequest;
+use App\Models\Stand;
 use App\Models\StandTemplate;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -170,12 +171,15 @@ class StandTemplateController extends Controller
     public function weeklyRanges(Request $request): JsonResponse
     {
         $congregationId = $request->get('congregation_id'); // maybe add validation
+        $standIds = $request->get('stand_ids', []); // maybe add validation
         /** @var Collection<StandTemplate> $standTemplates */
         $standTemplates = StandTemplate::query()
             ->select(['id', 'week_schedule'])
             ->where('congregation_id', $congregationId)
+            ->when($standIds, fn($query) => $query->whereIn('stand_id', $standIds))
             ->get();
 
+        $endDate = null;
         $weekRanges = [];
         foreach ($standTemplates as $standTemplate) {
             $weekSchedule = $standTemplate->week_schedule;
@@ -199,6 +203,7 @@ class StandTemplateController extends Controller
 
         return new JsonResponse([
             'weekly_ranges' => array_values(array_unique($weekRanges)),
+            'last_day_available_for_registration' => $endDate
         ]);
     }
 
