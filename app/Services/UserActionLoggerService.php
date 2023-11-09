@@ -9,11 +9,10 @@ class UserActionLoggerService
 {
     public static function logAction($action, array $payload): void
     {
-        $result = [
+        UsersActions::query()->create([
             'user_id' => auth()->id(),
             'payload' => json_encode($payload),
             'action' => $action,
-        ];
-        UsersActions::query()->create($result);
+        ]);
     }
 }

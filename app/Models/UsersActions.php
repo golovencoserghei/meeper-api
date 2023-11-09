@@ -18,8 +18,4 @@ class UsersActions extends Model
         'payload',
         'action',
     ];
-
-//    protected $casts = [
-//        'action' => UserActionEnum::class,
-//    ];
 }
