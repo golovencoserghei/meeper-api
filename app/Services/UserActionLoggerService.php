@@ -2,16 +2,18 @@
 
 namespace App\Services;
 
+use App\Enums\UserActionEnum;
 use App\Models\UsersActions;
 
 class UserActionLoggerService
 {
-    public static function logAction(string $action, array $payload)
+    public static function logAction($action, array $payload): void
     {
-        UsersActions::create([
+        $result = [
             'user_id' => auth()->id(),
-            'payload' => $payload,
+            'payload' => json_encode($payload),
             'action' => $action,
-        ]);
+        ];
+        UsersActions::query()->create($result);
     }
 }
