@@ -70,13 +70,15 @@ class LoginController extends Controller
      */
     public function userProfile(): UserInfoResource
     {
-        return new UserInfoResource(
-            User::query()
-                ->select('users.*', 'congregations.name as congregation_name')
-                ->where('users.id', Auth::id())
-                ->join('congregations', 'users.congregation_id', '=', 'congregations.id')
-                ->first()
-            );
+        /** @var User $user */
+        $user = User::query()
+            ->select('users.*', 'congregations.name as congregation_name')
+            ->where('users.id', Auth::id())
+            ->join('congregations', 'users.congregation_id', '=', 'congregations.id')
+            ->first();
+        $user->permissions = $user?->getAllPermissions()->pluck('name');
+
+        return new UserInfoResource($user);
     }
 
     public function userPermissions(): JsonResponse

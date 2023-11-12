@@ -12,7 +12,7 @@ class Congregation extends Model
 
     public const TABLE = 'congregations';
 
-    protected $guarded = ['*'];
+    protected $guarded = [];
 
     /**
      * Get all the stands for the Congregation
