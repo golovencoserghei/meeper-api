@@ -24,7 +24,7 @@ class UserInfoResource extends JsonResource
             'phone_number' => $this['phone_number'],
             'congregation_id' => $this['congregation_id'],
             'congregation_name' => $this['congregation_name'],
-            'congregation_code' => $this['congregation_code'],
+            'congregation_code' => $this['code'],
             'roles' => $this['roles']->pluck('name'),
             'permissions' => $this['permissions'],
         ];
