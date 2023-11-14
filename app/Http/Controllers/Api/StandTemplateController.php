@@ -6,13 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StandRequest;
 use App\Http\Requests\StandStoreRequest;
 use App\Http\Requests\StandUpdateRequest;
-use App\Models\Stand;
+use App\Http\Resources\StandTemplateCollection;
+use App\Http\Resources\StandTemplateResource;
 use App\Models\StandTemplate;
+use App\Services\Stand\StandTemplateService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class StandTemplateController extends Controller
@@ -105,6 +108,27 @@ class StandTemplateController extends Controller
         }
 
         return new JsonResponse(['data' => $results]);
+    }
+
+    public function indexV2(StandRequest $request, StandTemplateService $templateService): StandTemplateCollection
+    {
+        $dateDayEnd = Carbon::make($request->date_day_end);
+        $period = CarbonPeriod::create(
+            Carbon::make($request->date_day_start)?->format(self::DATE_FORMAT),
+            $dateDayEnd?->format(self::DATE_FORMAT)
+        );
+
+        $determinedWeek = now()->diffInWeeks($dateDayEnd) + 1; // because if current week than diff = 0
+
+        $standTemplates = $this->getStandTemplatesWithRelations($request);
+
+        if ($standTemplates->isEmpty()) {
+            return new StandTemplateCollection([]);
+        }
+
+        $formattedStandTemplates = $templateService->getFormattedResults($standTemplates, $determinedWeek, $period);
+
+        return new StandTemplateCollection(Collection::make($formattedStandTemplates));
     }
 
     public function store(StandStoreRequest $request): JsonResponse
@@ -210,5 +234,22 @@ class StandTemplateController extends Controller
     private function weekRangesFormat(string $startDate, string $endDate): string
     {
         return sprintf('%s %s', $startDate, $endDate);
+    }
+
+    /**
+     * @return EloquentCollection<StandTemplate>
+     */
+    private function getStandTemplatesWithRelations(StandRequest $request): EloquentCollection
+    {
+        return StandTemplate::query()
+            ->with([
+                'stand:id,name,location',
+                'congregation:id,name',
+                'standRecords:id,stand_template_id,day,date_time',
+                'standRecords.publishers:id,first_name,last_name,phone_number,email',
+            ])
+            ->whereIn('stand_id', $request->stand_ids)
+            ->where('congregation_id', $request->congregation_id)
+            ->get();
     }
 }
