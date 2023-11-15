@@ -19,6 +19,7 @@ class StandTemplateResource extends JsonResource
         return [
             'id' => $this['id'],
             'stand_id' => $this['stand_id'],
+            'stand' => $this['stand'],
             'congregation_id' => $this['congregation_id'],
             'activation_at' => $this['activation_at'],
             'publishers_at_stand' => $this['publishers_at_stand'],
