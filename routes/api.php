@@ -75,6 +75,7 @@ Route::group(['middleware' => 'auth:api'], static function () {
 //        ->middleware('role:' . RolesEnum::RESPONSIBLE_FOR_STAND->value . '|' . RolesEnum::ADMIN->value);
 
     Route::apiResource('stand/templates', StandTemplateController::class);
+    Route::get('stand/templates-v2', [StandTemplateController::class, 'indexV2']);
     Route::get('stand/weekly-ranges', [StandTemplateController::class, 'weeklyRanges']);
 
     Route::apiResource('stand/reports', StandReportsController::class);

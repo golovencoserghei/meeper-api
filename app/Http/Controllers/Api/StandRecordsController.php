@@ -21,12 +21,12 @@ class StandRecordsController extends Controller
     {
         DB::beginTransaction();
         try {
+            $attributes = $this->getStandRecordsAttributes($request);
+
+            $this->checkIfRecordAlreadyExistAndRemove($attributes);
+
             /** @var StandRecords $standRecord */
-            $standRecord = StandRecords::query()->create([
-                'stand_template_id' => $request->stand_template_id,
-                'day' => Carbon::parse($request->date_time)->dayOfWeekIso, // @todo - change name to week_day
-                'date_time' => Carbon::parse($request->date_time)->format('Y-m-d H:i:s'),
-            ]);
+            $standRecord = StandRecords::query()->create($attributes);
 
             $standRecord->publishers()->attach($request->publishers);
 
@@ -84,5 +84,29 @@ class StandRecordsController extends Controller
         $standRecords->delete();
 
         return Response::json(['message' => 'Stand record was deleted.']);
+    }
+
+    private function getStandRecordsAttributes(StandPublishersRequest $request): array
+    {
+        return [
+            'stand_template_id' => $request->stand_template_id,
+            'day' => Carbon::parse($request->date_time)->dayOfWeekIso, // @todo - change name to week_day
+            'date_time' => Carbon::parse($request->date_time)->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    private function checkIfRecordAlreadyExistAndRemove(array $attributes): void
+    {
+        $existingStandRecords = StandRecords::query()->with('publishers')->where($attributes)->get();
+
+        if ($existingStandRecords->isEmpty()) {
+            return;
+        }
+
+        $existingStandRecords->map(static function(StandRecords $standRecord) {
+            $standRecord->publishers()->detach();
+
+            $standRecord->delete();
+        });
     }
 }
