@@ -23,9 +23,7 @@ class StandTemplateResource extends JsonResource
             'activation_at' => $this['activation_at'],
             'publishers_at_stand' => $this['publishers_at_stand'],
             'is_reports_enabled' => $this['is_reports_enabled'],
-            'records' => $this['records'],
-            'stand' => $this['stand'],
-            'congregation' => $this['congregation'],
+            'records' => StandRecordsResource::collection($this['records']),
         ];
     }
 }

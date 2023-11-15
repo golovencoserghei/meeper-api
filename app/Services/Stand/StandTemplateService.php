@@ -15,7 +15,7 @@ class StandTemplateService
     /**
      * @param EloquentCollection<StandTemplate> $standTemplates
      */
-    public function getFormattedResults(
+    public function formatTemplatesForResponse(
         EloquentCollection $standTemplates,
         int $determinedWeek,
         CarbonPeriod $period,
@@ -24,17 +24,13 @@ class StandTemplateService
         foreach ($period as $date) {
             $templatesInDeterminedWeekDay = $this->getTemplatesInDeterminedWeekDay($standTemplates, $date, $determinedWeek);
 
-            $templatesInDeterminedWeekDay = collect($templatesInDeterminedWeekDay)->map(function ($record) {
-                unset($record['week_schedule'], $record['stand_records']);
-
-                return $record;
-            });  // @todo - move results array into custom resource and remove columns there
-
-            if ($templatesInDeterminedWeekDay->isNotEmpty()) {
-                $formattedPeriodDate = $date->format(self::DATE_FORMAT);
-
-                $results[$formattedPeriodDate] = $templatesInDeterminedWeekDay->toArray();
+            if (empty($templatesInDeterminedWeekDay)) {
+                continue;
             }
+
+            $formattedPeriodDate = $date->format(self::DATE_FORMAT);
+
+            $results[$formattedPeriodDate] = $templatesInDeterminedWeekDay;
         }
 
         return $results;
@@ -63,10 +59,12 @@ class StandTemplateService
         $determinedWeekDay = $date->dayOfWeekIso;
         /** @var StandTemplate $template */
         foreach ($standTemplates as $template) {
+            // check if there is a specific week number and day of week from requested period
             if (!isset($template->week_schedule[$determinedWeek][$determinedWeekDay])) {
                 continue;
             }
 
+            // get from schedule hours when stand stays
             $dayTimes = $template->week_schedule[$determinedWeek][$determinedWeekDay];
 
             $neededPublishersByDay = $this->getNeededPublishersByDay($template, $date);
@@ -93,7 +91,7 @@ class StandTemplateService
             $minute = explode(':', $dayTime)[1] ?? '00';
             $time = "$hour:$minute";
 
-            $fullDate = $date->format("Y-m-d $time:00"); // added :00 because in DB we store data in H:i:s format
+            $fullDate = $date->format("Y-m-d $time:00"); // added :00 at the end because in DB we store data in H:i:s format
 
             $records[] = [
                 'time' => $time,

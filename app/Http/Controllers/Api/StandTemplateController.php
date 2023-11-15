@@ -7,7 +7,6 @@ use App\Http\Requests\StandRequest;
 use App\Http\Requests\StandStoreRequest;
 use App\Http\Requests\StandUpdateRequest;
 use App\Http\Resources\StandTemplateCollection;
-use App\Http\Resources\StandTemplateResource;
 use App\Models\StandTemplate;
 use App\Services\Stand\StandTemplateService;
 use Carbon\Carbon;
@@ -126,9 +125,9 @@ class StandTemplateController extends Controller
             return new StandTemplateCollection([]);
         }
 
-        $formattedStandTemplates = $templateService->getFormattedResults($standTemplates, $determinedWeek, $period);
+        $formattedStandTemplates = $templateService->formatTemplatesForResponse($standTemplates, $determinedWeek, $period);
 
-        return new StandTemplateCollection(Collection::make($formattedStandTemplates));
+        return StandTemplateCollection::make($formattedStandTemplates);
     }
 
     public function store(StandStoreRequest $request): JsonResponse
