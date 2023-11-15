@@ -21,94 +21,6 @@ class StandTemplateController extends Controller
 {
     private const DATE_FORMAT = 'd-m-Y';
 
-    public function index(StandRequest $request): JsonResponse
-    {
-        $dateDayEnd = Carbon::make($request->date_day_end);
-        $period = CarbonPeriod::create(
-            Carbon::make($request->date_day_start)?->format(self::DATE_FORMAT),
-            $dateDayEnd?->format(self::DATE_FORMAT)
-        );
-
-        $determinedWeek = now()->diffInWeeks($dateDayEnd) + 1; // because if current week than diff = 0
-
-        $standTemplates = StandTemplate::query()
-            ->with([
-                'stand:id,name,location',
-                'congregation:id,name',
-                'standRecords:id,stand_template_id,day,date_time',
-                'standRecords.publishers:id,first_name,last_name,phone_number,email',
-            ])
-            ->whereIn('stand_id', $request->stand_ids)
-            ->where('congregation_id', $request->congregation_id)
-            ->get();
-
-        if ($standTemplates->isEmpty()) {
-            return new JsonResponse(['data' => []]);
-        }
-
-        $results = [];
-        foreach ($period as $date) {
-            $weekDayFromPeriod = $date->format(self::DATE_FORMAT);
-            $determinedWeekDay = $date->dayOfWeekIso;
-            [$day, $month] = explode('-', $weekDayFromPeriod);
-            $year = $date->format('Y');
-            $carbonFullTime = Carbon::createFromFormat(self::DATE_FORMAT, "$day-$month-$year");
-
-            $templatesInDeterminedWeekDay = [];
-            /** @var StandTemplate $template */
-            foreach ($standTemplates as $template) {
-                if (!isset($template->week_schedule[$determinedWeek][$determinedWeekDay])) {
-                    continue;
-                }
-
-                $dayTimes = $template->week_schedule[$determinedWeek][$determinedWeekDay]; // @todo - set attribute or work with arrays to avoid unpredictable behavior
-
-                $neededPublishersByDay = $template
-                    ->standRecords
-                    ->whereBetween(
-                        'date_time',
-                        [
-                            $carbonFullTime->startOfDay()->format('Y-m-d H:i:s'),
-                            $carbonFullTime->endOfDay()->format('Y-m-d H:i:s')
-                        ]
-                    )
-                    ->keyBy('date_time');
-
-                $records = [];
-                foreach ($dayTimes as $dayTime) {
-                    $hour = explode(':', $dayTime)[0];
-                    $minute = explode(':', $dayTime)[1] ?? '00';
-                    $time = "$hour:$minute";
-                    $fullDate = "$year-$month-$day $time:00";
-
-                    $records[] = [
-                        'time' => $time,
-                        'publishers_records' => $neededPublishersByDay[$fullDate] ?? []
-                    ];
-                }
-
-                $template['records'] = $records;
-                $template['dateTimes'] = $dayTimes;
-
-                $templatesInDeterminedWeekDay[] = $template->toArray();
-            }
-
-            unset($template['day_times'], $template['publishers_records']);
-
-            $templatesInDeterminedWeekDay = collect($templatesInDeterminedWeekDay)->map(function ($record) {
-                unset($record['week_schedule'], $record['stand_records']);
-
-                return $record;
-            });  // @todo - move results array into custom resource and remove columns there
-
-            if ($templatesInDeterminedWeekDay->isNotEmpty()) {
-                $results[$weekDayFromPeriod] = $templatesInDeterminedWeekDay->toArray();
-            }
-        }
-
-        return new JsonResponse(['data' => $results]);
-    }
-
     public function indexV2(StandRequest $request, StandTemplateService $templateService): StandTemplateCollection
     {
         $dateDayEnd = Carbon::make($request->date_day_end);
@@ -243,9 +155,8 @@ class StandTemplateController extends Controller
         return StandTemplate::query()
             ->with([
                 'stand:id,name,location',
-                'congregation:id,name',
-                'standRecords:id,stand_template_id,day,date_time',
-                'standRecords.publishers:id,first_name,last_name,phone_number,email',
+                'standRecords:id,stand_template_id,date_time',
+                'standRecords.publishers:id,first_name,last_name',
             ])
             ->whereIn('stand_id', $request->stand_ids)
             ->where('congregation_id', $request->congregation_id)
