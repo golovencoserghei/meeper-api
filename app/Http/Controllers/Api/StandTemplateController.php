@@ -122,7 +122,7 @@ class StandTemplateController extends Controller
         $standTemplates = $this->getStandTemplatesWithRelations($request);
 
         if ($standTemplates->isEmpty()) {
-            return new StandTemplateCollection([]);
+            return StandTemplateCollection::make([]);
         }
 
         $formattedStandTemplates = $templateService->formatTemplatesForResponse($standTemplates, $determinedWeek, $period);
