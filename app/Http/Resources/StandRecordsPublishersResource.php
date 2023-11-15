@@ -17,7 +17,9 @@ class StandRecordsPublishersResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'date_time' => $this->resource->date_time->format('d-m-Y H:i'),
-            'publishers' => StandPublisherResource::collection($this->resource->publishers),
+            'publishers' => !empty($this->resource->publishers)
+                ? StandPublisherResource::collection($this->resource->publishers)
+                : [],
         ];
     }
 }
