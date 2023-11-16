@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\RolesEnum;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegistrationController;
 use App\Http\Controllers\Api\BuilderAssistant\WarehouseController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Api\StandController;
 use App\Http\Controllers\Api\StandRecordsController;
 use App\Http\Controllers\Api\StandReportsController;
 use App\Http\Controllers\Api\StandTemplateController;
+use App\Http\Controllers\Api\UserActionsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -80,6 +80,8 @@ Route::group(['middleware' => 'auth:api'], static function () {
     Route::get('stand/weekly-ranges', [StandTemplateController::class, 'weeklyRanges']);
 
     Route::apiResource('stand/reports', StandReportsController::class);
+
+    Route::get('/logger', [UserActionsController::class, 'index']);
 
     Route::get('warehouse', [WarehouseController::class, 'index']);
     Route::post('warehouse', [WarehouseController::class, 'store']);
